@@ -2,7 +2,7 @@ FROM node
 
 ENV HOME /opt/fake-leancloud-auth
 
-ADD package.json $HOME/
+ADD package.json npm-shrinkwrap.json $HOME/
 
 WORKDIR $HOME
 

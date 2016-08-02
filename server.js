@@ -17,7 +17,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: new MongoSessionStore({
-    url: 'mongodb://localhost:27017/local'
+    url: process.env.MONGO_URL || 'mongodb://localhost:27017/local'
   })
 }))
 app.use(passport.initialize())
