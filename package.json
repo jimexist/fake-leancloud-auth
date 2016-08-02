@@ -38,7 +38,9 @@
     "validator": "^5.5.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
     "mocha": "^3.0.0",
-    "standard": "^7.1.2"
+    "standard": "^7.1.2",
+    "supertest": "^2.0.0"
   }
 }
