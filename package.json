@@ -1,0 +1,35 @@
+{
+  "name": "fake-leancloud-auth",
+  "version": "0.1.0",
+  "description": "fake leancloud auth api for testing",
+  "main": "server.js",
+  "scripts": {
+    "pretest": "standard",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jimexist/fake-leancloud-auth.git"
+  },
+  "keywords": [
+    "fake",
+    "leancloud",
+    "api",
+    "auth"
+  ],
+  "author": "Jiayu Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jimexist/fake-leancloud-auth/issues"
+  },
+  "homepage": "https://github.com/Jimexist/fake-leancloud-auth#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "helmet": "^2.1.2",
+    "morgan": "^1.7.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.0",
+    "standard": "^7.1.2"
+  }
+}
