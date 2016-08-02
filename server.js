@@ -2,9 +2,11 @@ const express = require('express')
 const passport = require('passport')
 const bodyParser = require('body-parser')
 const session = require('express-session')
+const mongoose = require('mongoose')
 const morgan = require('morgan')
 const connectMongo = require('connect-mongo')
 const User = require('./models/user')
+const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/local'
 
 const app = express()
 
@@ -17,7 +19,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: new MongoSessionStore({
-    url: process.env.MONGO_URL || 'mongodb://localhost:27017/local'
+    url: mongoUrl
   })
 }))
 app.use(passport.initialize())
@@ -30,6 +32,15 @@ passport.deserializeUser(User.deserializeUser())
 if (process.env.NODE_ENV === 'prod') {
   app.use(require('helmet')())
 }
+
+mongoose.connect(mongoUrl, err => {
+  if (err) {
+    console.error('failed to connect to mongo', err)
+    process.exit(-1)
+  } else {
+    console.log('successfully connected to mongo at', mongoUrl)
+  }
+})
 
 app.get('/version', (req, res) => {
   res.json({
@@ -50,13 +61,13 @@ api.route('/users')
     })
   })
   .post((req, res, next) => {
-    const { username, password, phone } = req.query
-    console.log('try to register', username, password, phone)
-    User.register({
+    const { username, password, phone, email } = req.query
+    User.register(new User({
       username,
       password,
-      phone
-    }, password, err => {
+      phone,
+      email
+    }), password, err => {
       if (err) {
         console.warn('error during register', err)
         next(err)
