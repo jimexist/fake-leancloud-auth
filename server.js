@@ -49,10 +49,27 @@ api.route('/users')
       status: 'ok'
     })
   })
-  .post((req, res) => {
+  .post((req, res, next) => {
     const { username, password, phone } = req.query
-    console.log(username, password, phone)
-    res.sendStatus(201)
+    console.log('try to register', username, password, phone)
+    User.register({
+      username,
+      password,
+      phone
+    }, password, err => {
+      if (err) {
+        console.warn('error during register', err)
+        next(err)
+      } else {
+        console.log('user registered')
+        res.sendStatus(201)
+      }
+    })
+  })
+
+api.route('/users/me')
+  .get((req, res) => {
+    res.json(req.user)
   })
 
 api.route('/users/:userId')

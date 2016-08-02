@@ -27,6 +27,8 @@ const User = new Schema({
 })
 
 User.plugin(passportLocalMongoose, {
+  usernameField: 'username',
+  usernameUnique: true,
   usernameQueryFields: ['objectId', 'email']
 })
 
