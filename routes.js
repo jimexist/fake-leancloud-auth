@@ -5,8 +5,6 @@ const User = require('./models/user')
 
 const api = express.Router()
 
-const urlBase = '' // we do not use this yet
-
 const userFields = [
   'username',
   'objectId',
@@ -42,7 +40,7 @@ api.route('/users')
       if (err) {
         res.status(400).send(err.message)
       } else {
-        res.set('Location', `${urlBase}/1.1/users/${user.objectId}`)
+        res.location(`${req.baseUrl}${req.path}/${user.objectId}`)
           .status(201)
           .json(safeReturnUser(req, user))
       }
