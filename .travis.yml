@@ -1,3 +1,10 @@
 language: node_js
 node_js:
   - "6"
+
+services:
+  - mongodb
+
+before_script:
+  # let mongodb start
+  - sleep 10

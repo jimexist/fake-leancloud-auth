@@ -5,7 +5,7 @@ const User = require('./models/user')
 
 const api = express.Router()
 
-const urlBase = '' // we do not use this
+const urlBase = '' // we do not use this yet
 
 const userFields = [
   'username',
