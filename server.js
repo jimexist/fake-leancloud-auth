@@ -2,6 +2,7 @@ const express = require('express')
 const passport = require('passport')
 const bodyParser = require('body-parser')
 const session = require('express-session')
+const _ = require('lodash')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
 const connectMongo = require('connect-mongo')
@@ -51,50 +52,66 @@ app.get('/version', (req, res) => {
 
 const api = express.Router()
 
+const urlBase = '' // we do not use this
+
+const userFields = [
+  'username',
+  'objectId',
+  'createdAt',
+  'updatedAt',
+  'phone',
+  'emailVerified',
+  'mobilePhoneVerified'
+]
+
+function safeReturnUser(req, user=req.user, sessionToken=req.sessionToken) {
+  const val = _.chain(user).pick(userFields)
+  if (sessionToken) {
+    val.set('sessionToken', sessionToken)
+  }
+  return val.value()
+}
+
 api.route('/login')
-  .get(passport.authenticate('local'))
+  .get(passport.authenticate('local'), (req, res) => {
+    res.json(safeReturnUser(req))
+  })
 
 api.route('/users')
-  .get((req, res) => {
-    res.json({
-      status: 'ok'
-    })
-  })
   .post((req, res, next) => {
-    const { username, password, phone, email } = req.query
+    const { username, password, phone, email } = req.body
     User.register(new User({
       username,
       password,
       phone,
       email
-    }), password, err => {
+    }), password, (err, user) => {
       if (err) {
-        console.warn('error during register', err)
-        next(err)
+        res.status(400).send(err.message)
       } else {
-        console.log('user registered')
-        res.sendStatus(201)
+        res.set('Location', `${urlBase}/1.1/users/${user.objectId}`)
+          .status(201)
+          .json(safeReturnUser(req, user))
       }
     })
   })
 
 api.route('/users/me')
   .get((req, res) => {
-    res.json(req.user)
+    res.json(safeReturnUser(req))
   })
 
-api.route('/users/:userId')
-  .get((req, res) => {
-    const userId = req.params.userId
-    res.json({
-      userId
-    })
-  })
-  .delete((req, res) => {
-    const userId = req.params.userId
-    res.json({
-      userId,
-      deleted: true
+api.route('/users/:userId([0-9a-fA-F]{24}$)')
+  .get((req, res, next) => {
+    const { userId } = req.params
+    User.findById(userId, (err, user) => {
+      if (err) {
+        res.status(400).send(err.message)
+      } else if (user) {
+        res.json(safeReturnUser(req, user, null))
+      } else {
+        res.sendStatus(404)
+      }
     })
   })
 

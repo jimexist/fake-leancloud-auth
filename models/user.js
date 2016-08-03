@@ -15,7 +15,7 @@ const User = new Schema({
   },
   phone: {
     type: String,
-    required: true
+    required: true,
     validate: {
       validator: isNumeric
     }
@@ -30,6 +30,10 @@ const User = new Schema({
   }
 }, {
   timestamps: true
+})
+
+User.virtual('objectId').get(function () {
+  return this._id
 })
 
 User.plugin(passportLocalMongoose, {

@@ -30,6 +30,7 @@
     "express": "^4.14.0",
     "express-session": "^1.14.0",
     "helmet": "^2.1.2",
+    "lodash": "^4.14.1",
     "mongoose": "^4.5.8",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
