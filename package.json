@@ -1,10 +1,11 @@
 {
   "name": "fake-leancloud-auth",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "fake leancloud auth api for testing",
   "main": "server.js",
   "scripts": {
-    "pretest": "standard",
+    "pretest": "snazzy",
+    "prepublish": "snazzy",
     "test": "mocha"
   },
   "repository": {
@@ -40,6 +41,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.0.0",
+    "snazzy": "^4.0.0",
     "standard": "^7.1.2",
     "supertest": "^2.0.0"
   }

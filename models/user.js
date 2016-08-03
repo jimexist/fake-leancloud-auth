@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const isEmail = require('validator/lib/isEmail')
+const isNumeric = require('validator/lib/isNumeric')
 const passportLocalMongoose = require('passport-local-mongoose')
 
 const User = new Schema({
@@ -15,6 +16,9 @@ const User = new Schema({
   phone: {
     type: String,
     required: true
+    validate: {
+      validator: isNumeric
+    }
   },
   emailVerified: {
     type: Boolean,
