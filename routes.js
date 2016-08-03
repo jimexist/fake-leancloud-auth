@@ -17,10 +17,10 @@ const userFields = [
   'mobilePhoneVerified'
 ]
 
-function safeReturnUser (req, user = req.user, sessionToken = req.sessionToken) {
-  const val = _.chain(user).pick(userFields)
+function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
+  let val = _.chain(user).pick(userFields)
   if (sessionToken) {
-    val.set('sessionToken', sessionToken)
+    val = val.set('sessionToken', sessionToken)
   }
   return val.value()
 }

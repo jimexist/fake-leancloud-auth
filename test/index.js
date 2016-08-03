@@ -45,4 +45,43 @@ describe('FakeLeancloudAuth', () => {
       }
     }).catch(err => done(err))
   })
+
+  it('should allow you to logout', done => {
+    AV.User.logOut().then(err => {
+      if (err) {
+        done(err)
+      } else {
+        expect(AV.User.current()).to.equal(null)
+        done()
+      }
+    })
+  })
+
+  it('should allow you to login again', done => {
+    AV.User.logIn(fixture.username, fixture.password).then(user => {
+      if (user) {
+        expect(user.authenticated()).to.equal(true)
+        expect(user.getSessionToken()).to.be.not.empty
+        expect(user.isCurrent()).to.equal(true)
+        expect(user.getUsername()).to.equal(fixture.username)
+        done()
+      } else {
+        done(new Error('empty user'))
+      }
+    }).catch(err => done(err))
+  })
+
+  it('should then allow you to call current user', done => {
+    AV.User.currentAsync().then(user => {
+      if (user) {
+        expect(user.authenticated()).to.equal(true)
+        expect(user.getSessionToken()).to.be.not.empty
+        expect(user.isCurrent()).to.equal(true)
+        expect(user.getUsername()).to.equal(fixture.username)
+        done()
+      } else {
+        done(new Error('empty user'))
+      }
+    }).catch(err => done(err))
+  })
 })
