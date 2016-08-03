@@ -41,9 +41,10 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "faker": "^3.1.0",
+    "leancloud-storage": "^1.3.2",
     "mocha": "^3.0.0",
     "snazzy": "^4.0.0",
-    "standard": "^7.1.2",
-    "supertest": "^2.0.0"
+    "standard": "^7.1.2"
   }
 }
