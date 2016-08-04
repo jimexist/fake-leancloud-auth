@@ -36,10 +36,18 @@ User.virtual('objectId').get(function () {
   return this._id
 })
 
+const fields = {
+  objectId: 1,
+  username: 1,
+  email: 1,
+  phone: 1
+}
+
 User.plugin(passportLocalMongoose, {
   usernameField: 'username',
   usernameUnique: true,
-  usernameQueryFields: ['objectId', 'email']
+  usernameQueryFields: ['objectId', 'email'],
+  selectFields: fields
 })
 
 module.exports = mongoose.model('User', User)

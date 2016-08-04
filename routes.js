@@ -2,6 +2,7 @@ const express = require('express')
 const _ = require('lodash')
 const passport = require('passport')
 const User = require('./models/user')
+const { ensureAuthHeaders } = require('./middlewares/ensureHeaders')
 
 const api = express.Router()
 
@@ -16,6 +17,9 @@ const userFields = [
 ]
 
 function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
+  if (_.isEmpty(user)) {
+    return user
+  }
   let val = _.chain(user).pick(userFields)
   if (sessionToken) {
     val = val.set('sessionToken', sessionToken)
@@ -48,8 +52,27 @@ api.route('/users')
   })
 
 api.route('/users/me')
-  .get((req, res) => {
-    res.json(safeReturnUser(req))
+  .get(ensureAuthHeaders, (req, res, next) => {
+    // TODO - get session object from session store
+    const username = _.get(req, 'session.passport.user')
+    console.log('username', username)
+    if (username) {
+      User.findByUsername(username, (err, user) => {
+        if (err) {
+          return next(err)
+        }
+        if (user) {
+          res.json(safeReturnUser(req, user))
+        } else {
+          res.json({
+            code: 211,
+            error: 'Could not find user'
+          })
+        }
+      })
+    } else {
+      res.sendStatus(401)
+    }
   })
 
 api.route('/users/:userId([0-9a-fA-F]{24}$)')
