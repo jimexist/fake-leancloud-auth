@@ -15,6 +15,5 @@ function checkHeaders (headers) {
 }
 
 module.exports = {
-  ensureAppHeaders: checkHeaders(['X-LC-Id', 'X-LC-Key']),
-  ensureAuthHeaders: checkHeaders(['X-LC-Session'])
+  ensureAppHeaders: checkHeaders(['X-LC-Id', 'X-LC-Key'])
 }

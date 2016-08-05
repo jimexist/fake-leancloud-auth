@@ -2,7 +2,6 @@ const express = require('express')
 const _ = require('lodash')
 const passport = require('passport')
 const User = require('./models/user')
-const { ensureAuthHeaders } = require('./middlewares/ensureHeaders')
 
 const api = express.Router()
 
@@ -52,27 +51,35 @@ api.route('/users')
   })
 
 api.route('/users/me')
-  .get(ensureAuthHeaders, (req, res, next) => {
-    // TODO - get session object from session store
-    const username = _.get(req, 'session.passport.user')
-    console.log('username', username)
-    if (username) {
+  .get((req, res, next) => {
+    const sessionToken = req.get('X-LC-Session')
+    console.log('session token', sessionToken)
+    if (_.isEmpty(sessionToken)) {
+      return res.status(400).send('Session token must be set')
+    }
+    // this is an undocumented API thus a hack - in order to pull the store
+    const { sessionStore } = req
+    sessionStore.get(sessionToken, (err, session) => {
+      if (err) {
+        return res.status(400).send(err.message)
+      }
+      const username = _.get(session, 'passport.user')
+      if (_.isEmpty(username)) {
+        return res.status(401).send('Unauthorized.')
+      }
       User.findByUsername(username, (err, user) => {
         if (err) {
           return next(err)
         }
-        if (user) {
-          res.json(safeReturnUser(req, user))
-        } else {
-          res.json({
+        if (_.isEmpty(user)) {
+          return res.status(404).json({
             code: 211,
             error: 'Could not find user'
           })
         }
+        return res.json(safeReturnUser(null, user, sessionToken))
       })
-    } else {
-      res.sendStatus(401)
-    }
+    })
   })
 
 api.route('/users/:userId([0-9a-fA-F]{24}$)')
@@ -84,7 +91,10 @@ api.route('/users/:userId([0-9a-fA-F]{24}$)')
       } else if (user) {
         res.json(safeReturnUser(req, user, null))
       } else {
-        res.sendStatus(404)
+        return res.status(404).json({
+          code: 211,
+          error: 'Could not find user'
+        })
       }
     })
   })
