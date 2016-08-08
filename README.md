@@ -3,6 +3,8 @@
 
 A fake Leancloud auth backend for integration testing purpose. **Note that this is not an official repo.**
 
+[中文介绍文档 / Introduction in Chinese](http://www.jiayul.me/tutorial/2016/08/08/fake-leancloud-auth-a-node-based-api-server-example.html)
+
 ## Why
 
 When you use Leancloud and want to test against its API for authentication relation functionalities, this is the repo that you want. The purpose of this repo is to bring up a backend that mimics the real Leancloud as close as possible, yet only include minimal features of authentication modules.
