@@ -12,7 +12,8 @@ const userFields = [
   'updatedAt',
   'phone',
   'emailVerified',
-  'mobilePhoneVerified'
+  'mobilePhoneVerified',
+  'turbineUserId'
 ]
 
 function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
@@ -82,6 +83,11 @@ api.route('/users/me')
     })
   })
 
+const ERR_USER_NOT_FOUND = {
+  code: 211,
+  error: 'Could not find user'
+}
+
 api.route('/users/:userId([0-9a-fA-F]{24}$)')
   .get((req, res, next) => {
     const { userId } = req.params
@@ -91,10 +97,23 @@ api.route('/users/:userId([0-9a-fA-F]{24}$)')
       } else if (user) {
         res.json(safeReturnUser(req, user, null))
       } else {
-        return res.status(404).json({
-          code: 211,
-          error: 'Could not find user'
-        })
+        return res.status(404).json(ERR_USER_NOT_FOUND)
+      }
+    })
+  })
+
+api.route('/classes/_User/:userId([0-9a-fA-F]{24}$)')
+  .put((req, res, next) => {
+    const { userId } = req.params
+    const { turbineUserId } = req.body
+    // we only allow for updating turbine user id
+    User.findByIdAndUpdate(userId, { turbineUserId }, (err, user) => {
+      if (err) {
+        res.status(400).send(err.message)
+      } else if (user) {
+        res.json(safeReturnUser(req, user, null))
+      } else {
+        return res.status(404).json(ERR_USER_NOT_FOUND)
       }
     })
   })

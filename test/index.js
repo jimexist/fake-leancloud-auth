@@ -26,7 +26,8 @@ describe('FakeLeancloudAuth', () => {
       username: faker.internet.userName(),
       password: faker.internet.password(),
       phone: faker.phone.phoneNumber('13#########'),
-      email: faker.internet.email()
+      email: faker.internet.email(),
+      turbineUserId: faker.internet.userName()
     }
   })
 
@@ -79,6 +80,20 @@ describe('FakeLeancloudAuth', () => {
         expect(user.isCurrent()).to.equal(true)
         expect(user.getUsername()).to.equal(fixture.username)
         done()
+      } else {
+        done(new Error('empty user'))
+      }
+    }).catch(err => done(err))
+  })
+
+  it('should allow you to set custom field', done => {
+    AV.User.logIn(fixture.username, fixture.password).then(user => {
+      if (user) {
+        user.set('turbineUserId', fixture.turbineUserId)
+        user.save().then(updatedUser => {
+          expect(updatedUser.get('turbineUserId')).to.equal(fixture.turbineUserId)
+          done()
+        }, err => done(err))
       } else {
         done(new Error('empty user'))
       }
