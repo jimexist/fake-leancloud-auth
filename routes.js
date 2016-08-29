@@ -28,7 +28,10 @@ function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
 }
 
 api.route('/login')
-  .get(passport.authenticate('local'), (req, res) => {
+  // leancloud backend supports POST and GET
+  // but the JS API until now still fires GET request
+  // so for compatibility reason we have to support both of them
+  .all(passport.authenticate('local'), (req, res) => {
     res.json(safeReturnUser(req))
   })
 
