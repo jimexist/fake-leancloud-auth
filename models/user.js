@@ -27,6 +27,9 @@ const User = new Schema({
   mobilePhoneVerified: {
     type: Boolean,
     default: false
+  },
+  turbineUserId: {
+    type: String
   }
 }, {
   timestamps: true
@@ -40,7 +43,8 @@ const fields = {
   objectId: 1,
   username: 1,
   email: 1,
-  phone: 1
+  phone: 1,
+  turbineUserId: 1
 }
 
 User.plugin(passportLocalMongoose, {
