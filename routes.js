@@ -10,6 +10,7 @@ const userFields = [
   'objectId',
   'createdAt',
   'updatedAt',
+  'email',
   'phone',
   'emailVerified',
   'mobilePhoneVerified',
@@ -57,7 +58,6 @@ api.route('/users')
 api.route('/users/me')
   .get((req, res, next) => {
     const sessionToken = req.get('X-LC-Session')
-    console.log('session token', sessionToken)
     if (_.isEmpty(sessionToken)) {
       return res.status(400).send('Session token must be set')
     }

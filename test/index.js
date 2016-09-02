@@ -3,6 +3,7 @@ const chai = require('chai')
 const faker = require('faker')
 const AV = require('leancloud-storage')
 const _ = require('lodash')
+const morgan = require('morgan')
 const expect = chai.expect
 
 const appId = 'fake_app_id'
@@ -21,6 +22,7 @@ describe('FakeLeancloudAuth', () => {
 
   before(done => {
     app = require('../app')
+    app.use(morgan('dev'))
     app.listen(3000, done)
     fixture = {
       username: faker.internet.userName(),
@@ -40,6 +42,7 @@ describe('FakeLeancloudAuth', () => {
       if (user) {
         expect(user.isCurrent()).to.equal(true)
         expect(user.getUsername()).to.equal(fixture.username)
+        expect(user.getEmail()).to.equal(fixture.email)
         done()
       } else {
         done(new Error('empty user'))
@@ -65,11 +68,12 @@ describe('FakeLeancloudAuth', () => {
         expect(user.getSessionToken()).to.be.not.empty
         expect(user.isCurrent()).to.equal(true)
         expect(user.getUsername()).to.equal(fixture.username)
+        expect(user.getEmail()).to.equal(fixture.email)
         done()
       } else {
         done(new Error('empty user'))
       }
-    }).catch(err => done(err))
+    }, err => done(err))
   })
 
   it('should then allow you to call current user', done => {
@@ -79,11 +83,12 @@ describe('FakeLeancloudAuth', () => {
         expect(user.getSessionToken()).to.be.not.empty
         expect(user.isCurrent()).to.equal(true)
         expect(user.getUsername()).to.equal(fixture.username)
+        expect(user.getEmail()).to.equal(fixture.email)
         done()
       } else {
         done(new Error('empty user'))
       }
-    }).catch(err => done(err))
+    }, err => done(err))
   })
 
   it('should allow you to set custom field', done => {
@@ -97,6 +102,6 @@ describe('FakeLeancloudAuth', () => {
       } else {
         done(new Error('empty user'))
       }
-    }).catch(err => done(err))
+    }, err => done(err))
   })
 })
