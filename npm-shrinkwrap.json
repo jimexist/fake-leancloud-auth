@@ -1159,9 +1159,9 @@
       "resolved": "https://registry.npmjs.org/proxy-addr/-/proxy-addr-1.1.2.tgz"
     },
     "qiniu": {
-      "version": "6.1.3",
-      "from": "qiniu@6.1.3",
-      "resolved": "https://registry.npmjs.org/qiniu/-/qiniu-6.1.3.tgz",
+      "version": "6.1.11",
+      "from": "qiniu@>=6.1.11 <7.0.0",
+      "resolved": "https://registry.npmjs.org/qiniu/-/qiniu-6.1.11.tgz",
       "dependencies": {
         "mime": {
           "version": "1.2.9",
