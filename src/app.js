@@ -10,6 +10,8 @@ const User = require('./models/user')
 const { ensureAppHeaders } = require('./middlewares/ensureHeaders')
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/local'
 
+mongoose.Promise = global.Promise
+
 const app = express()
 
 app.use(morgan(process.env.NODE_ENV === 'prod' ? 'combined' : 'dev'))
