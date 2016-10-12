@@ -23,7 +23,7 @@ describe('FakeLeancloudAuth', () => {
   let fixture
 
   before(done => {
-    app = require('../app')
+    app = require('../src/app')
     app.use(morgan('dev'))
     app.listen(3000, done)
     fixture = {
