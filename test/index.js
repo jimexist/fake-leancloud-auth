@@ -3,6 +3,7 @@ const chai = require('chai')
 const faker = require('faker')
 const AV = require('leancloud-storage')
 const _ = require('lodash')
+const fetch = require('node-fetch')
 const morgan = require('morgan')
 const expect = chai.expect
 
@@ -29,7 +30,11 @@ describe('FakeLeancloudAuth', () => {
       password: faker.internet.password(),
       phone: faker.phone.phoneNumber('13#########'),
       email: faker.internet.email(),
-      turbineUserId: faker.internet.userName()
+      turbineUserId: faker.internet.userName(),
+      spareUsername: faker.internet.userName(),
+      sparePassword: faker.internet.password(),
+      sparePhone: faker.phone.phoneNumber('13#########'),
+      spareEmail: faker.internet.email()
     }
   })
 
@@ -103,5 +108,86 @@ describe('FakeLeancloudAuth', () => {
         done(new Error('empty user'))
       }
     }, err => done(err))
+  })
+
+  it('should allow you to update other fields including username', (done) => {
+    const {
+      username,
+      password,
+      sparePhone,
+      spareEmail,
+      spareUsername,
+      sparePassword,
+    } = fixture
+    const headers = {
+      'X-LC-Id': 'x-lc-id',
+      'X-LC-Key': 'x-lc-key',
+      'X-LC-Session': 'x-lc-session',
+      'Content-Type': 'application/json'
+    }
+    AV.User.currentAsync().then(user => {
+      if (user) {
+        const objectId = user.getObjectId()
+        fetch(`http://localhost:3000/1.1/users/${objectId}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            phone: sparePhone,
+            email: spareEmail,
+            username: spareUsername,
+          })
+        })
+        .then(res => res.json())
+        .then(info => {
+          expect(info).to.have.property('updatedAt')
+          AV.User.logIn(spareUsername, password).then(user => {
+            const newEmail = user.getEmail()
+            const newPhone = user.get('phone')
+            const newUsername = user.getUsername()
+            expect(newEmail).to.equal(spareEmail)
+            expect(newPhone).to.equal(sparePhone)
+            expect(newUsername).to.equal(spareUsername)
+            done()
+          })
+        })
+      }
+    })
+  })
+
+  it('should allow you to update password', (done) => {
+    const {
+      username,
+      password,
+      spareUsername,
+      sparePassword
+    } = fixture
+    console.log(password)
+    console.log(sparePassword)
+    const headers = {
+      'X-LC-Id': 'x-lc-id',
+      'X-LC-Key': 'x-lc-key',
+      'X-LC-Session': 'x-lc-session',
+      'Content-Type': 'application/json'
+    }
+    AV.User.currentAsync().then(user => {
+      if (user) {
+        const objectId = user.getObjectId()
+        fetch(`http://localhost:3000/1.1/users/${objectId}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            password: sparePassword
+          })
+        })
+        .then(res => res.json())
+        .then(info => {
+          expect(info).to.have.property('updatedAt')
+          AV.User.logIn(spareUsername, sparePassword).then(user => {
+            expect(user).to.be.not.empty
+            done()
+          })
+        })
+      }
+    })
   })
 })

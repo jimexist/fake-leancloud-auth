@@ -102,6 +102,45 @@ api.route('/users/:userId([0-9a-fA-F]{24}$)')
       }
     })
   })
+  .put((req, res, next) => {
+    const { userId } = req.params
+    const keysCount = _.keys(req.body).length
+    const hasPassword = _.has(req.body, 'password')
+    if (keysCount > 0 && !hasPassword) {
+      User.findByIdAndUpdate(userId, req.body, (err, user) => {
+        if (err) {
+          res.status(400).send(err.message)
+        } else if (user) {
+          const { updatedAt } = user
+          res.json({ updatedAt })
+        } else {
+          return res.status(400).json(ERR_USER_NOT_FOUND)
+        }
+      })
+    } else if (keysCount === 1 && hasPassword) {
+      User.findById(userId, (err, user) => {
+        if (err) {
+          res.status(400).send(err.message)
+        } else if (user) {
+          user.setPassword(req.body.password, (err, user, passwordErr) => {
+            if (err) {
+              res.status(400).send(passwordErr.message)
+            } else if (user) {
+              const { updatedAt, hash, salt } = user
+              User.findByIdAndUpdate(userId, { hash, salt }, (err, user) => {
+                const { updatedAt } = user
+                res.json({ updatedAt })
+              })
+            } else {
+              return res.status(400).json(ERR_USER_NOT_FOUND)
+            }
+          })
+        } else {
+          return res.status(400).json(ERR_USER_NOT_FOUND)
+        }
+      })
+    }
+  })
 
 api.route('/classes/_User/:userId([0-9a-fA-F]{24}$)')
   .put((req, res, next) => {
