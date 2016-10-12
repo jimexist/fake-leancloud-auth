@@ -17,6 +17,11 @@ const userFields = [
   'turbineUserId'
 ]
 
+const ERR_USER_NOT_FOUND = {
+  code: 211,
+  error: 'Could not find user'
+}
+
 function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
   if (_.isEmpty(user)) {
     return user
@@ -28,6 +33,30 @@ function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
   return val.value()
 }
 
+function registerUser(user, password) {
+  return new Promise((resolve, reject) => {
+    User.register(user, password, (err, user) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(user)
+      }
+    })
+  })
+}
+
+function setPassword(user, password) {
+  return new Promise((resolve, reject) => {
+    user.setPassword(password, (err, user, passwordErr) => {
+      if (err) {
+        reject(passwordErr)
+      } else if (user) {
+        resolve(user)
+      }
+    })
+  })
+}
+
 api.route('/login')
   // https://github.com/leancloud/javascript-sdk/pull/347 now login uses POST
   .post(passport.authenticate('local'), (req, res) => {
@@ -35,22 +64,20 @@ api.route('/login')
   })
 
 api.route('/users')
-  .post((req, res, next) => {
+  .post(async (req, res, next) => {
     const { username, password, phone, email } = req.body
-    User.register(new User({
-      username,
-      password,
-      phone,
-      email
-    }), password, (err, user) => {
-      if (err) {
-        res.status(400).send(err.message)
-      } else {
-        res.location(`${req.baseUrl}${req.path}/${user.objectId}`)
-          .status(201)
-          .json(safeReturnUser(req, user))
-      }
-    })
+    try {
+      const user = await registerUser(new User({
+        username,
+        phone,
+        email
+      }), password)
+      res.location(`${req.baseUrl}${req.path}/${user.objectId}`)
+        .status(201)
+        .json(safeReturnUser(req, user))
+    } catch (err) {
+      res.status(400).send(err.message)
+    }
   })
 
 api.route('/users/me')
@@ -84,78 +111,71 @@ api.route('/users/me')
     })
   })
 
-const ERR_USER_NOT_FOUND = {
-  code: 211,
-  error: 'Could not find user'
-}
-
 api.route('/users/:userId([0-9a-fA-F]{24}$)')
-  .get((req, res, next) => {
+  .get(async (req, res, next) => {
     const { userId } = req.params
-    User.findById(userId, (err, user) => {
-      if (err) {
-        res.status(400).send(err.message)
-      } else if (user) {
+    try {
+      const user = await User.findById(userId)
+      if (user) {
         res.json(safeReturnUser(req, user, null))
       } else {
-        return res.status(404).json(ERR_USER_NOT_FOUND)
+        res.status(404).json(ERR_USER_NOT_FOUND)
       }
-    })
+    } catch (error) {
+      res.status(400).send(error.message)
+    }
   })
-  .put((req, res, next) => {
+  .put(async (req, res, next) => {
     const { userId } = req.params
     const keysCount = _.keys(req.body).length
     const hasPassword = _.has(req.body, 'password')
     if (keysCount > 0 && !hasPassword) {
-      User.findByIdAndUpdate(userId, req.body, (err, user) => {
-        if (err) {
-          res.status(400).send(err.message)
-        } else if (user) {
+      try {
+        const user = await User.findByIdAndUpdate(userId, req.body)
+        if (user) {
           const { updatedAt } = user
           res.json({ updatedAt })
         } else {
-          return res.status(400).json(ERR_USER_NOT_FOUND)
+          res.status(400).json(ERR_USER_NOT_FOUND)
         }
-      })
+      } catch (err) {
+        res.status(400).send(err.message)
+      }
     } else if (keysCount === 1 && hasPassword) {
-      User.findById(userId, (err, user) => {
-        if (err) {
-          res.status(400).send(err.message)
-        } else if (user) {
-          user.setPassword(req.body.password, (err, user, passwordErr) => {
-            if (err) {
-              res.status(400).send(passwordErr.message)
-            } else if (user) {
-              const { updatedAt, hash, salt } = user
-              User.findByIdAndUpdate(userId, { hash, salt }, (err, user) => {
-                const { updatedAt } = user
-                res.json({ updatedAt })
-              })
-            } else {
-              return res.status(400).json(ERR_USER_NOT_FOUND)
-            }
-          })
+      try {
+        const user = await User.findById(userId)
+        if (user) {
+          const updateInfo = await setPassword(user, req.body.password)
+          const { hash, salt } = updateInfo
+          const updatedUser = await User.findByIdAndUpdate(userId, { hash, salt })
+          const { updatedAt } = updatedUser
+          res.json({ updatedAt })
         } else {
-          return res.status(400).json(ERR_USER_NOT_FOUND)
+          res.status(404).json(ERR_USER_NOT_FOUND)
         }
-      })
+      } catch (err) {
+        res.status(400).send(err.message)
+      }
+    } else {
+      res.sendStatus(400)
     }
   })
 
 api.route('/classes/_User/:userId([0-9a-fA-F]{24}$)')
-  .put((req, res, next) => {
+  .put(async (req, res, next) => {
     const { userId } = req.params
     const { turbineUserId } = req.body
     // we only allow for updating turbine user id
-    User.findByIdAndUpdate(userId, { turbineUserId }, (err, user) => {
-      if (err) {
-        res.status(400).send(err.message)
-      } else if (user) {
+    try {
+      const user = await User.findByIdAndUpdate(userId, { turbineUserId })
+      if (user) {
         res.json(safeReturnUser(req, user, null))
       } else {
-        return res.status(404).json(ERR_USER_NOT_FOUND)
+        res.status(404).json(ERR_USER_NOT_FOUND)
       }
-    })
+    } catch (err) {
+      res.status(400).send(err.message)
+    }
   })
 
 module.exports = api

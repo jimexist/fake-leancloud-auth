@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+mongoose.Promise = require('bluebird')
 const Schema = mongoose.Schema
 const isEmail = require('validator/lib/isEmail')
 const isNumeric = require('validator/lib/isNumeric')

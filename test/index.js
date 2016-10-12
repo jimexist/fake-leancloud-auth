@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+require('babel-polyfill')
 const chai = require('chai')
 const faker = require('faker')
 const AV = require('leancloud-storage')
@@ -161,8 +162,6 @@ describe('FakeLeancloudAuth', () => {
       spareUsername,
       sparePassword
     } = fixture
-    console.log(password)
-    console.log(sparePassword)
     const headers = {
       'X-LC-Id': 'x-lc-id',
       'X-LC-Key': 'x-lc-key',

@@ -1,3 +1,4 @@
+require('babel-polyfill')
 const express = require('express')
 const passport = require('passport')
 const bodyParser = require('body-parser')
@@ -8,8 +9,6 @@ const connectMongo = require('connect-mongo')
 const User = require('./models/user')
 const { ensureAppHeaders } = require('./middlewares/ensureHeaders')
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/local'
-
-mongoose.Promise = global.Promise
 
 const app = express()
 
