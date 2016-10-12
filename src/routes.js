@@ -33,7 +33,7 @@ function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
   return val.value()
 }
 
-function registerUser(user, password) {
+function registerUser (user, password) {
   return new Promise((resolve, reject) => {
     User.register(user, password, (err, user) => {
       if (err) {
@@ -45,7 +45,7 @@ function registerUser(user, password) {
   })
 }
 
-function setPassword(user, password) {
+function setPassword (user, password) {
   return new Promise((resolve, reject) => {
     user.setPassword(password, (err, user, passwordErr) => {
       if (err) {

@@ -113,12 +113,10 @@ describe('FakeLeancloudAuth', () => {
 
   it('should allow you to update other fields including username', (done) => {
     const {
-      username,
       password,
       sparePhone,
       spareEmail,
-      spareUsername,
-      sparePassword,
+      spareUsername
     } = fixture
     const headers = {
       'X-LC-Id': 'x-lc-id',
@@ -135,7 +133,7 @@ describe('FakeLeancloudAuth', () => {
           body: JSON.stringify({
             phone: sparePhone,
             email: spareEmail,
-            username: spareUsername,
+            username: spareUsername
           })
         })
         .then(res => res.json())
@@ -157,8 +155,6 @@ describe('FakeLeancloudAuth', () => {
 
   it('should allow you to update password', (done) => {
     const {
-      username,
-      password,
       spareUsername,
       sparePassword
     } = fixture
