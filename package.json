@@ -4,9 +4,13 @@
   "description": "fake leancloud auth api for testing",
   "main": "server.js",
   "scripts": {
+    "start": "babel-node src/server",
+    "start:prod": "node lib/server",
+    "build": "babel src --out-dir lib",
     "pretest": "snazzy",
     "prepublish": "snazzy",
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "standard --verbose | snazzy"
   },
   "repository": {
     "type": "git",
@@ -25,6 +29,7 @@
   },
   "homepage": "https://github.com/Jimexist/fake-leancloud-auth#readme",
   "dependencies": {
+    "babel-polyfill": "6.16.0",
     "body-parser": "^1.15.2",
     "connect-mongo": "^1.3.2",
     "express": "^4.14.0",
@@ -40,11 +45,20 @@
     "validator": "^5.5.0"
   },
   "devDependencies": {
+    "babel-cli": "6.16.0",
+    "babel-eslint": "7.0.0",
+    "babel-plugin-transform-async-to-generator": "6.16.0",
+    "babel-preset-es2015": "6.16.0",
+    "babel-preset-stage-0": "6.16.0",
     "chai": "^3.5.0",
     "faker": "^3.1.0",
     "leancloud-storage": "^1.4.0",
     "mocha": "^3.0.0",
+    "node-fetch": "1.6.3",
     "snazzy": "^4.0.0",
     "standard": "^7.1.2"
+  },
+  "standard": {
+    "parser": "babel-eslint"
   }
 }
