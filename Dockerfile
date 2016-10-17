@@ -1,4 +1,4 @@
-FROM node:6
+FROM node
 
 MAINTAINER Jiayu Liu <etareduce@gmail.com>
 
