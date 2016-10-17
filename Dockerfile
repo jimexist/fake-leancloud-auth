@@ -18,7 +18,7 @@ RUN npm build && \
     npm prune --production && \
     yarn cache clean && \
     npm uninstall -g yarn && \
-    npm cache clean && \
+    npm cache clean
 
 EXPOSE 3000
 
