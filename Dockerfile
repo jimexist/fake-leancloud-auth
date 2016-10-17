@@ -1,4 +1,4 @@
-FROM node
+FROM node:6
 
 MAINTAINER Jiayu Liu <etareduce@gmail.com>
 
@@ -17,9 +17,9 @@ ADD . $HOME/
 RUN npm build && \
     npm prune --production && \
     yarn cache clean && \
-    npm uninstall -g yarn && \
     npm cache clean
 
 EXPOSE 3000
 
-ENTRYPOINT ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:prod"]
+
