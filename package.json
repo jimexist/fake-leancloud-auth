@@ -1,6 +1,6 @@
 {
   "name": "fake-leancloud-auth",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "fake leancloud auth api for testing",
   "main": "server.js",
   "scripts": {
