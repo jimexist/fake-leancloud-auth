@@ -12,7 +12,7 @@ RUN npm install
 
 ADD . $HOME/
 
-RUN npm build && \
+RUN npm run build && \
     npm prune --production && \
     npm cache clean
 
