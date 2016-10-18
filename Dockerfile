@@ -18,5 +18,8 @@ RUN npm run build && \
 
 EXPOSE 3000
 
+ENV NODE_ENV production
+ENV MONGO_URL mongodb://mongo:27017/local
+
 CMD ["npm", "run", "start:prod"]
 
