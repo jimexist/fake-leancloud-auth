@@ -6,9 +6,9 @@ ENV HOME /opt/fake-leancloud-auth
 
 WORKDIR $HOME
 
-ADD package.json yarn.lock $HOME/
+ADD package.json npm-shrinkwrap.json $HOME/
 
-RUN npm install yarn && ./node_modules/.bin/yarn
+RUN npm install
 
 ADD . $HOME/
 
