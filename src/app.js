@@ -55,4 +55,11 @@ app.get('/version', (req, res) => {
 
 app.use('/1.1', ensureAppHeaders, require('./routes'))
 
+app.use('/ping', (req, res) => {
+  res.json({
+    msg: 'pong',
+    status: 'ok'
+  })
+})
+
 module.exports = app
