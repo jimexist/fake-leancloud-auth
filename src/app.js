@@ -21,7 +21,7 @@ const MongoSessionStore = connectMongo(session)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'b77cb93f19d72207a8b2442949257128',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: new MongoSessionStore({
     url: mongoUrl
   })
