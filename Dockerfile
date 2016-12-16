@@ -2,6 +2,9 @@ FROM node:6-alpine
 
 MAINTAINER Jiayu Liu <etareduce@gmail.com>
 
+RUN addgroup -g 998 -S fake-leancloud \
+    && adduser -D -u 998 -S -G fake-leancloud fake-leancloud
+
 # see https://github.com/tianon/gosu
 ENV GOSU_VERSION 1.9
 
@@ -38,4 +41,4 @@ EXPOSE 3000
 ENV NODE_ENV production
 ENV MONGO_URL mongodb://mongo:27017/local
 
-CMD ["npm", "run", "start:prod"]
+CMD ["gosu", "fake-leancloud", "npm", "run", "start:prod"]
