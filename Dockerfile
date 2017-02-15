@@ -6,7 +6,7 @@ RUN addgroup -g 998 -S fake-leancloud \
     && adduser -D -u 998 -S -G fake-leancloud fake-leancloud
 
 # see https://github.com/tianon/gosu
-ENV GOSU_VERSION 1.9
+ENV GOSU_VERSION 1.10
 
 RUN set -x \
     && apk add --no-cache --virtual .gosu-deps \
@@ -28,17 +28,17 @@ ENV WORKDIR /opt/fake-leancloud-auth
 
 WORKDIR $WORKDIR
 
-ADD package.json yarn.lock $WORKDIR/
+ADD package.json npm-shrinkwrap.json $WORKDIR/
 
-RUN npm install -g yarn && yarn
+RUN npm install
 
 ADD . $WORKDIR/
 
-RUN npm run build && yarn cache clean
+RUN npm run build
+
+ENV NODE_ENV=production \
+    MONGO_URL=mongodb://mongo:27017/local
 
 EXPOSE 3000
-
-ENV NODE_ENV production
-ENV MONGO_URL mongodb://mongo:27017/local
 
 CMD ["gosu", "fake-leancloud", "npm", "run", "start:prod"]
