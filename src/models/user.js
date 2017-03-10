@@ -4,6 +4,8 @@ const isEmail = require('validator/lib/isEmail')
 const isNumeric = require('validator/lib/isNumeric')
 const passportLocalMongoose = require('passport-local-mongoose')
 
+mongoose.Promise = Promise
+
 const User = new Schema({
   email: {
     type: String,

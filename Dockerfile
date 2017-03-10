@@ -1,44 +1,28 @@
 FROM node:6-alpine
 
-MAINTAINER Jiayu Liu <etareduce@gmail.com>
+LABEL maintainer Jiayu Liu <etareduce@gmail.com>
 
 RUN addgroup -g 998 -S fake-leancloud \
     && adduser -D -u 998 -S -G fake-leancloud fake-leancloud
 
-# see https://github.com/tianon/gosu
-ENV GOSU_VERSION 1.10
-
-RUN set -x \
-    && apk add --no-cache --virtual .gosu-deps \
-        dpkg \
-        gnupg \
-        openssl \
-    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-    && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true \
-    && apk del .gosu-deps
+# grab su-exec for easy step-down from root
+RUN apk add --no-cache 'su-exec>=0.2'
 
 ENV WORKDIR /opt/fake-leancloud-auth
 
 WORKDIR $WORKDIR
 
-ADD package.json npm-shrinkwrap.json $WORKDIR/
+ADD package.json yarn.lock $WORKDIR/
 
 RUN npm install
 
 ADD . $WORKDIR/
 
-RUN npm run build
+RUN yarn && npm run build && yarn cache clean
 
 ENV NODE_ENV=production \
     MONGO_URL=mongodb://mongo:27017/local
 
 EXPOSE 3000
 
-CMD ["gosu", "fake-leancloud", "npm", "run", "start:prod"]
+CMD ["su-exec", "fake-leancloud", "npm", "run", "start:prod"]
