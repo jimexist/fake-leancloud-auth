@@ -14,11 +14,11 @@ WORKDIR $WORKDIR
 
 ADD package.json yarn.lock $WORKDIR/
 
-RUN npm install
+RUN yarn
 
 ADD . $WORKDIR/
 
-RUN yarn && npm run build && yarn cache clean
+RUN npm run build && yarn cache clean
 
 ENV NODE_ENV=production \
     MONGO_URL=mongodb://mongo:27017/local
