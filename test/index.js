@@ -6,7 +6,7 @@ const AV = require('leancloud-storage')
 const _ = require('lodash')
 const fetch = require('node-fetch')
 const morgan = require('morgan')
-const expect = chai.expect
+const assert = chai.assert
 
 const appId = 'fake_app_id'
 const appKey = 'fake_app_key'
@@ -40,15 +40,15 @@ describe('FakeLeancloudAuth', () => {
   })
 
   it('should by default be null', () => {
-    expect(AV.User.current()).to.equal(null)
+    assert.isNull(AV.User.current())
   })
 
   it('should allow you to register', done => {
     AV.User.signUp(fixture.username, fixture.password, _.pick(fixture, ['email', 'phone'])).then(user => {
       if (user) {
-        expect(user.isCurrent()).to.equal(true)
-        expect(user.getUsername()).to.equal(fixture.username)
-        expect(user.getEmail()).to.equal(fixture.email)
+        assert.isTrue(user.isCurrent())
+        assert.equal(user.getUsername(), fixture.username)
+        assert.equal(user.getEmail(), fixture.email)
         done()
       } else {
         done(new Error('empty user'))
@@ -61,7 +61,7 @@ describe('FakeLeancloudAuth', () => {
       if (err) {
         done(err)
       } else {
-        expect(AV.User.current()).to.equal(null)
+        assert.isNull(AV.User.current())
         done()
       }
     })
@@ -70,31 +70,35 @@ describe('FakeLeancloudAuth', () => {
   it('should allow you to login again', done => {
     AV.User.logIn(fixture.username, fixture.password).then(user => {
       if (user) {
-        expect(user.authenticated()).to.equal(true)
-        expect(user.getSessionToken()).to.be.not.empty
-        expect(user.isCurrent()).to.equal(true)
-        expect(user.getUsername()).to.equal(fixture.username)
-        expect(user.getEmail()).to.equal(fixture.email)
-        done()
+        user.isAuthenticated().then(result => {
+          assert.isTrue(result)
+          assert.isString(user.getSessionToken())
+          assert.equal(user.isCurrent(), true)
+          assert.equal(user.getUsername(), fixture.username)
+          assert.equal(user.getEmail(), fixture.email)
+          done()
+        }).catch(err => done(err))
       } else {
         done(new Error('empty user'))
       }
-    }, err => done(err))
+    }).catch(err => done(err))
   })
 
   it('should then allow you to call current user', done => {
     AV.User.currentAsync().then(user => {
       if (user) {
-        expect(user.authenticated()).to.equal(true)
-        expect(user.getSessionToken()).to.be.not.empty
-        expect(user.isCurrent()).to.equal(true)
-        expect(user.getUsername()).to.equal(fixture.username)
-        expect(user.getEmail()).to.equal(fixture.email)
-        done()
+        user.isAuthenticated().then(value => {
+          assert.isTrue(value)
+          assert.isNotNull(user.getSessionToken())
+          assert.isTrue(user.isCurrent())
+          assert.equal(user.getUsername(), fixture.username)
+          assert.equal(user.getEmail(), fixture.email)
+          done()
+        }).catch(err => done(err))
       } else {
         done(new Error('empty user'))
       }
-    }, err => done(err))
+    }).catch(err => done(err))
   })
 
   it('should allow you to set custom field', done => {
@@ -102,13 +106,13 @@ describe('FakeLeancloudAuth', () => {
       if (user) {
         user.set('turbineUserId', fixture.turbineUserId)
         user.save().then(updatedUser => {
-          expect(updatedUser.get('turbineUserId')).to.equal(fixture.turbineUserId)
+          assert.equal(updatedUser.get('turbineUserId'), fixture.turbineUserId)
           done()
-        }, err => done(err))
+        }).catch(err => done(err))
       } else {
         done(new Error('empty user'))
       }
-    }, err => done(err))
+    }).catch(err => done(err))
   })
 
   it('should allow you to update other fields including username', (done) => {
@@ -138,14 +142,14 @@ describe('FakeLeancloudAuth', () => {
         })
         .then(res => res.json())
         .then(info => {
-          expect(info).to.have.property('updatedAt')
+          assert.property(info, 'updatedAt')
           AV.User.logIn(spareUsername, password).then(user => {
             const newEmail = user.getEmail()
             const newPhone = user.get('phone')
             const newUsername = user.getUsername()
-            expect(newEmail).to.equal(spareEmail)
-            expect(newPhone).to.equal(sparePhone)
-            expect(newUsername).to.equal(spareUsername)
+            assert.equal(newEmail, spareEmail)
+            assert.equal(newPhone, sparePhone)
+            assert.equal(newUsername, spareUsername)
             done()
           })
         })
@@ -176,9 +180,9 @@ describe('FakeLeancloudAuth', () => {
         })
         .then(res => res.json())
         .then(info => {
-          expect(info).to.have.property('updatedAt')
+          assert.property(info, 'updatedAt')
           AV.User.logIn(spareUsername, sparePassword).then(user => {
-            expect(user).to.be.not.empty
+            assert.isObject(user)
             done()
           })
         })

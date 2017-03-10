@@ -27,10 +27,8 @@ docker run -d \
   --name fake-leancloud-auth \
   --link mongo \
   -p 3000:3000 \
-  -e 'NODE_ENV=production'
-  -e 'MONGO_URL=mongodb://mongo:27017/local'
   jimexist/fake-leancloud-auth
-curl localhost:3000/version
+curl -v localhost:3000/version
 ```
 
 ### Local run
