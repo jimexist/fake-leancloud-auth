@@ -1,4 +1,4 @@
-FROM node:6-alpine
+FROM node:7-alpine
 
 LABEL maintainer Jiayu Liu <etareduce@gmail.com>
 
