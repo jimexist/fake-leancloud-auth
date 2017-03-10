@@ -10,6 +10,7 @@ const User = require('./models/user')
 const { ensureAppHeaders } = require('./middlewares/ensureHeaders')
 const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017/local'
 
+// replace the promise implementation
 mongoose.Promise = global.Promise
 
 const app = express()
@@ -30,6 +31,7 @@ app.use(session({
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
+
 app.use(passport.initialize())
 app.use(passport.session())
 

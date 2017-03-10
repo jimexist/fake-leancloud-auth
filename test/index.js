@@ -108,11 +108,11 @@ describe('FakeLeancloudAuth', () => {
         user.save().then(updatedUser => {
           assert.equal(updatedUser.get('turbineUserId'), fixture.turbineUserId)
           done()
-        }, err => done(err))
+        }).catch(err => done(err))
       } else {
         done(new Error('empty user'))
       }
-    }, err => done(err))
+    }).catch(err => done(err))
   })
 
   it('should allow you to update other fields including username', (done) => {
