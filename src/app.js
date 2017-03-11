@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'prod') {
   app.use(require('helmet')())
 }
 
-mongoose.connect(mongoUrl, err => {
+mongoose.connect(mongoUrl, { server: { poolSize: 5 } }, err => {
   if (err) {
     console.error('failed to connect to mongo', err)
     process.exit(-1)

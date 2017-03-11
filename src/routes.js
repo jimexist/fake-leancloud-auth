@@ -35,10 +35,12 @@ function safeReturnUser (req, user = req.user, sessionToken = req.sessionID) {
 
 function registerUser (user, password) {
   return new Promise((resolve, reject) => {
+    console.time('registerUser')
     User.register(user, password, (err, user) => {
       if (err) {
         reject(err)
       } else {
+        console.timeEnd('registerUser')
         resolve(user)
       }
     })
@@ -47,10 +49,12 @@ function registerUser (user, password) {
 
 function setPassword (user, password) {
   return new Promise((resolve, reject) => {
+    console.time('setPassword')
     user.setPassword(password, (err, user, passwordErr) => {
       if (err) {
         reject(passwordErr)
       } else if (user) {
+        console.timeEnd('setPassword')
         resolve(user)
       }
     })
@@ -88,6 +92,7 @@ api.route('/users/me')
     }
     // this is an undocumented API thus a hack - in order to pull the store
     const { sessionStore } = req
+    console.time('getMe')
     sessionStore.get(sessionToken, (err, session) => {
       if (err) {
         return res.status(400).send(err.message)
@@ -100,6 +105,7 @@ api.route('/users/me')
         if (err) {
           return next(err)
         }
+        console.timeEnd('getMe')
         if (_.isEmpty(user)) {
           return res.status(404).json({
             code: 211,
@@ -115,8 +121,10 @@ api.route('/users/:userId([0-9a-fA-F]{24}$)')
   .get(async (req, res, next) => {
     const { userId } = req.params
     try {
+      console.time('findById')
       const user = await User.findById(userId)
       if (user) {
+        console.timeEnd('findById')
         res.json(safeReturnUser(req, user, null))
       } else {
         res.status(404).json(ERR_USER_NOT_FOUND)
@@ -167,8 +175,10 @@ api.route('/classes/_User/:userId([0-9a-fA-F]{24}$)')
     const { turbineUserId } = req.body
     // we only allow for updating turbine user id
     try {
+      console.time('putById')
       const user = await User.findByIdAndUpdate(userId, { turbineUserId })
       if (user) {
+        console.timeEnd('putById')
         res.json(safeReturnUser(req, user, null))
       } else {
         res.status(404).json(ERR_USER_NOT_FOUND)
