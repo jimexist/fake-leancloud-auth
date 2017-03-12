@@ -53,7 +53,10 @@ User.plugin(passportLocalMongoose, {
   usernameField: 'username',
   usernameUnique: true,
   usernameQueryFields: ['objectId', 'email'],
-  selectFields: fields
+  selectFields: fields,
+  // not a good idea for production system but here we are using it for test
+  // so setting this value to be 1000
+  iterations: process.env.PBK_HK2_ITERATIONS || 1000
 })
 
 module.exports = mongoose.model('User', User)
